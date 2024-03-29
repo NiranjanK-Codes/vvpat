@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Verifiable Paper Audit Trail (VVPAT) System</title>
+    <style>
+        .container {
+            text-align: center;
+        }
+
+        .image-frame {
+            position: relative;
+            display: inline-block;
+        }
+
+        .vote-button {
+            position: absolute;
+            padding: 10px 20px; /* Adjust button padding */
+            font-size: 16px; /* Adjust button font size */
+        }
+
+        .vote-count {
+            position: absolute;
+            border: 1px solid #000;
+            background-color: #fff;
+            padding: 20px; /* Adjust vote count box padding */
+            border-radius: 10px;
+            font-size: 25px; /* Adjust vote count box font size */
+            font-family: Arial, sans-serif; /* Set font-family to Arial */
+            font-weight: bold; /* Set font-weight to bold */
+        }
+
+        .dot {
+            height: 25px;
+            width: 25px;
+            background-color: red;
+            border-radius: 50%;
+            display: none;
+            position: absolute;
+        }
+
+        .circle {
+            position: absolute;
+            height: 24px; /* Adjust circle size */
+            width: 24px; /* Adjust circle size */
+            border: 2px solid black; /* Adjust circle border */
+            border-radius: 50%;
+        }
+
+        .total-votes {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            border: 2px solid black;
+            background-color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voter Verifiable Paper Audit Trail (VVPAT) System</h1>
+        <div class="image-frame">
+            <!-- Display the image frame here -->
+            <img src="C:\Users\niran\OneDrive\Desktop\vvpat\Vote Displayed (1).png" alt="Model Frame" id="model-image">
+            <div class="controls">
+                <button class="vote-button" onclick="castVote('Candidate A')" style="left: 385px; top: 110px;">UDF</button>
+                <button class="vote-button" onclick="castVote('Candidate B')" style="left: 385px; top: 280px;">LDF</button>
+                <button class="vote-button" onclick="castVote('Candidate C')" style="left: 385px; top: 450px;">BJP</button>
+            </div>
+            <div class="vote-count" style="left: 970px; top: 95px;">
+                <span id="votes-candidate-a">0</span>
+            </div>
+            <div class="vote-count" style="left: 970px; top: 265px;">
+                <span id="votes-candidate-b">0</span>
+            </div>
+            <div class="vote-count" style="left: 970px; top: 435px;">
+                <span id="votes-candidate-c">0</span>
+            </div>
+            <div class="vote-count" style="left: 1245px; top: 95px;">
+                <span id="clicks-candidate-a">0</span>
+            </div>
+            <div class="vote-count" style="left: 1245px; top: 265px;">
+                <span id="clicks-candidate-b">0</span>
+            </div>
+            <div class="vote-count" style="left: 1245px; top: 435px;">
+                <span id="clicks-candidate-c">0</span>
+            </div>
+            <!-- Dots for signaling -->
+            <div class="dot" id="dot-candidate-a" style="right: 700px; top: 122px;"></div>
+            <div class="dot" id="dot-candidate-b" style="right: 700px; top: 290px;"></div>
+            <div class="dot" id="dot-candidate-c" style="right: 700px; top: 458px;"></div>
+            <!-- Circles around dots -->
+            <div class="circle" id="circle-candidate-a" style="right: 698px; top: 120px;"></div>
+            <div class="circle" id="circle-candidate-b" style="right: 698px; top: 288px;"></div>
+            <div class="circle" id="circle-candidate-c" style="right: 698px; top: 456px;"></div>
+        </div>
+    </div>
+
+    <!-- Total Votes Display -->
+    <div class="total-votes" id="total-votes">Total Votes: 0</div>
+
+    <script>
+        let totalVotes = 0;
+        let votesCandidateA = 0;
+        let votesCandidateB = 0;
+        let votesCandidateC = 0;
+        let alternateVoteForC = false;
+        let clicksCandidateA = 0;
+        let clicksCandidateB = 0;
+        let clicksCandidateC = 0;
+
+        function castVote(candidate) {
+            // Display dot for the respective candidate
+            switch (candidate) {
+                case 'Candidate A':
+                    document.getElementById('dot-candidate-a').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('dot-candidate-a').style.display = 'none';
+                    }, 250); // Hide the dot after 1 second
+                    break;
+                case 'Candidate B':
+                    document.getElementById('dot-candidate-b').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('dot-candidate-b').style.display = 'none';
+                    }, 250); // Hide the dot after 1 second
+                    break;
+                case 'Candidate C':
+                    document.getElementById('dot-candidate-c').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('dot-candidate-c').style.display = 'none';
+                    }, 250); // Hide the dot after 1 second
+                    break;
+                default:
+                    break;
+            }
+
+            // Update vote counts
+            switch(candidate) {
+                case 'Candidate A':
+                    clicksCandidateA++;
+                    document.getElementById('clicks-candidate-a').innerText = clicksCandidateA;
+
+                    if (alternateVoteForC) {
+                        votesCandidateC++;
+                        document.getElementById('votes-candidate-c').innerText = votesCandidateC;
+                    } else {
+                        votesCandidateA++;
+                        document.getElementById('votes-candidate-a').innerText = votesCandidateA;
+                    }
+                    alternateVoteForC = !alternateVoteForC;
+                    break;
+                case 'Candidate B':
+                    clicksCandidateB++;
+                    document.getElementById('clicks-candidate-b').innerText = clicksCandidateB;
+
+                    if (alternateVoteForC) {
+                        votesCandidateC++;
+                        document.getElementById('votes-candidate-c').innerText = votesCandidateC;
+                    } else {
+                        votesCandidateB++;
+                        document.getElementById('votes-candidate-b').innerText = votesCandidateB;
+                    }
+                    alternateVoteForC = !alternateVoteForC;
+                    break;
+                case 'Candidate C':
+                    clicksCandidateC++;
+                    document.getElementById('clicks-candidate-c').innerText = clicksCandidateC;
+
+                    votesCandidateC++;
+                    document.getElementById('votes-candidate-c').innerText = votesCandidateC;
+                    break;
+                default:
+                    break;
+            }
+
+            // Update total votes
+            totalVotes++;
+            document.getElementById('total-votes').innerText = "Total Votes: " + totalVotes;
+        }
+    </script>
+</body>
+</html>
